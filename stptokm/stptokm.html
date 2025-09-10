@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Steps to KM Converter</title>
+  <title>Steps Converter</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
       background: #f7f7f7;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     .card {
-      max-width: 400px;
+      max-width: 450px;
       margin: 50px auto;
       padding: 20px;
       border-radius: 15px;
@@ -20,82 +23,132 @@
       text-align: center;
       margin-bottom: 20px;
     }
+    footer {
+      background: #343a40;
+      color: #fff;
+      padding: 10px 0;
+      text-align: center;
+      margin-top: auto;
+    }
   </style>
 </head>
 <body>
-    <div class="d-flex flex-column min-vh-100">
-      <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-          <div class="container">
-            <a class="navbar-brand fw-bold mx-auto" >Steps to KM</a>
-          </div>
-        </nav>
 
-    <div class="container">
-      <div class="card">
-        <h2>Steps to KM</h2>
-        <form id="stepsForm">
-          <!-- Steps input -->
-          <div class="mb-3">
-            <label for="steps" class="form-label">Steps</label>
-            <input type="number" id="steps" class="form-control" placeholder="Enter number of steps" required>
-          </div>
-
-          <!-- Sex selection -->
-          <div class="mb-3">
-            <label class="form-label">Sex</label><br>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="sex" id="male" value="male">
-              <label class="form-check-label" for="male">Male</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="sex" id="female" value="female">
-              <label class="form-check-label" for="female">Female</label>
-            </div>
-          </div>
-        </form>
-
-        <!-- Result -->
-        <div class="mt-4">
-          <h5>Distance (km):</h5>
-          <p id="result" class="fw-bold text-success fs-4">0.00 km</p>
-        </div>
-
-        <!-- Buttons -->
-        <div class="mt-3 d-flex justify-content-between">
-          <button class="btn btn-secondary w-50 me-2" onclick="resetForm()">Reset</button>
-          <a href="/index.html" class="btn btn-primary w-50 ms-2">Home</a>
-        </div>
-      </div>
-    </div>
-  
-    <!-- Footer placeholder -->
-      <div id="footer" style="padding-top: 7.7%;"></div>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand fw-bold mx-auto" href="#">Steps Converter</a>
   </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container">
+  <div class="card">
+    <h2>Steps Converter</h2>
+    <form id="stepsForm">
+      
+      <!-- Steps input -->
+      <div class="mb-3">
+        <label for="steps" class="form-label">Number of Steps</label>
+        <input type="number" id="steps" class="form-control" placeholder="Enter steps" required>
+      </div>
+
+      <!-- Sex selection -->
+      <div class="mb-3">
+        <label class="form-label">Sex</label><br>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="sex" id="male" value="male">
+          <label class="form-check-label" for="male">Male</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="sex" id="female" value="female">
+          <label class="form-check-label" for="female">Female</label>
+        </div>
+        <small class="text-danger d-block mt-1">*Choose one option</small>
+      </div>
+
+      <!-- Unit selection -->
+      <div class="mb-3">
+        <label for="unit" class="form-label">Convert To</label>
+        <select id="unit" class="form-select">
+          <option value="km">Kilometers (km)</option>
+          <option value="m">Meters (m)</option>
+          <option value="cm">Centimeters (cm)</option>
+          <option value="ft">Feet (ft)</option>
+        </select>
+         <small class="text-danger d-block mt-1">*Choose one option</small>
+      </div>
+    </form>
+
+    <!-- Result -->
+    <div class="mt-4">
+      <h5>Converted Distance:</h5>
+      <p id="result" class="fw-bold text-success fs-4">0 km</p>
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex justify-content-between mt-3">
+      <button class="btn btn-secondary" type="button" onclick="resetForm()">Reset</button>
+      <button class="btn btn-primary" type="button" onclick="goHome()">Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+ <div id="footer" ></div>
+
 <script>
   function calculateDistance() {
     const steps = parseInt(document.getElementById("steps").value) || 0;
     const sexInput = document.querySelector('input[name="sex"]:checked');
     const sex = sexInput ? sexInput.value : null;
+    const unit = document.getElementById("unit").value;
 
+    // Step length (in meters)
     let stepLength = sex === "male" ? 0.78 : sex === "female" ? 0.70 : 0;
-    let distance = stepLength ? (steps * stepLength) / 1000 : 0;
+    let distanceInMeters = stepLength ? steps * stepLength : 0;
+    let converted = 0, unitLabel = "";
 
-    document.getElementById("result").textContent = distance.toFixed(2) + " km";
+    // Convert based on unit
+    switch(unit) {
+      case "km":
+        converted = distanceInMeters / 1000;
+        unitLabel = "km";
+        break;
+      case "m":
+        converted = distanceInMeters;
+        unitLabel = "m";
+        break;
+      case "cm":
+        converted = distanceInMeters * 100;
+        unitLabel = "cm";
+        break;
+      case "ft":
+        converted = distanceInMeters * 3.28084;
+        unitLabel = "ft";
+        break;
+    }
+
+    document.getElementById("result").textContent = converted.toFixed(2) + " " + unitLabel;
   }
 
   function resetForm() {
-    document.getElementById("steps").value = "";
-    document.querySelectorAll('input[name="sex"]').forEach(radio => radio.checked = false);
-    document.getElementById("result").textContent = "0.00 km";
+    document.getElementById("stepsForm").reset();
+    document.getElementById("result").textContent = "0 km";
   }
 
+  function goHome() {
+    window.location.href = "/index.html"; 
+  }
+
+  // Auto-calculate on input changes
   document.getElementById("steps").addEventListener("input", calculateDistance);
   document.querySelectorAll('input[name="sex"]').forEach(radio => {
     radio.addEventListener("change", calculateDistance);
   });
+  document.getElementById("unit").addEventListener("change", calculateDistance);
 
-  // Load footer.html into #footer
+     // Load footer.html into #footer
     fetch('footer.html')
       .then(response => response.text())
       .then(data => {
